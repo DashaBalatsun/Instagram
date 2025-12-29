@@ -5,6 +5,7 @@
 //  Created by Дарья Балацун on 22.12.25.
 //
 import UIKit
+import FirebaseAuth
 
 class ViewController: UIViewController {
     
@@ -20,8 +21,20 @@ class ViewController: UIViewController {
         tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
         tf.borderStyle = .roundedRect
         tf.font = UIFont.systemFont(ofSize: 14)
+        tf.addTarget(self, action: #selector(handleTextUnputChange), for: .editingChanged)
         return tf
     }()
+    
+    @objc func handleTextUnputChange() {
+        let isFormValid = emailTextField.text?.count ?? 0 > 0 && usernameTextField.text?.count ?? 0 > 0 && passwordTextField.text?.count ?? 0 > 0
+        if isFormValid {
+            signUpButton.isEnabled = true
+            signUpButton.backgroundColor = UIColor.rgb(red: 17, green: 154, blue: 237)
+        } else {
+            signUpButton.isEnabled = false
+            signUpButton.backgroundColor = UIColor.rgb(red: 149, green: 204, blue: 244)
+        }
+    }
     
     let usernameTextField: UITextField = {
         let tf = UITextField ()
@@ -29,6 +42,7 @@ class ViewController: UIViewController {
         tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
         tf.borderStyle = .roundedRect
         tf.font = UIFont.systemFont(ofSize: 14)
+        tf.addTarget(self, action: #selector(handleTextUnputChange), for: .editingChanged)
         return tf
     }()
     
@@ -39,6 +53,7 @@ class ViewController: UIViewController {
         tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
         tf.borderStyle = .roundedRect
         tf.font = UIFont.systemFont(ofSize: 14)
+        tf.addTarget(self, action: #selector(handleTextUnputChange), for: .editingChanged)
         return  tf
     }()
     
@@ -49,8 +64,24 @@ class ViewController: UIViewController {
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = UIColor.rgb(red: 149, green: 204, blue: 244)
+        button.addTarget(self, action: #selector(handleSignUp), for: .touchUpInside)
+        button.isEnabled = false
         return button
     }()
+    
+    @objc func handleSignUp() {
+        guard let email = emailTextField.text, email.count > 0 else { return }
+        guard let userName = usernameTextField.text, userName.count > 0 else { return }
+        guard let password = passwordTextField.text, password.count > 0  else { return }
+        
+        Auth.auth().createUser(withEmail: email, password: password) { user, error in
+            if let error = error {
+                print("Failed to create user", error)
+                return
+            }
+            print("Successfully crested user", user ?? "")
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,7 +90,7 @@ class ViewController: UIViewController {
         
         plusPhotoButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
-        plusPhotoButton.anchor(top: view.topAnchor, left: nil, bottom: nil, right: nil, paddingTop: 60, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 140, height: 40)
+        plusPhotoButton.anchor(top: view.topAnchor, left: nil, bottom: nil, right: nil, paddingTop: 60, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 40, height: 140)
         
         setupInputFields()
         
