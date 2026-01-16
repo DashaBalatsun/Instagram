@@ -141,6 +141,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate, UINaviga
                     
                     let dictinaryValues = ["username": username, "profileImageUrl": profileImageUrl]
                     let values = [user.uid:dictinaryValues]
+                    
                     Database.database().reference().child("users").updateChildValues(values, withCompletionBlock: { error, reference in
                         if let error = error {
                             print("Failed to save user into db", error.localizedDescription)
